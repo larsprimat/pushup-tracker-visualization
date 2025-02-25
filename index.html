@@ -225,6 +225,29 @@
             font-size: 0.9rem;
             text-decoration: none;
         }
+        
+        /* Debug panel */
+        .debug-panel {
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+        
+        .debug-panel h3 {
+            margin-top: 0;
+        }
+        
+        .debug-panel button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -434,12 +457,14 @@
         
         // Check for data in localStorage
         function checkForLocalData() {
+            console.log("Checking for local data...");
             const localData = localStorage.getItem('visualizationData');
             if (localData) {
                 try {
                     const parsedData = JSON.parse(localData);
                     if (Array.isArray(parsedData) && parsedData.length > 0) {
                         // We found valid data, use it
+                        console.log("Found valid data:", parsedData.length, "entries");
                         workoutData = parsedData;
                         updateChart(getActivePeriod());
                         return true;
@@ -448,16 +473,143 @@
                     console.error('Error parsing local data:', e);
                 }
             }
+            console.log("No valid visualization data found");
             return false;
+        }
+        
+        // Debug Data Status - shows a debug panel with information about localStorage data
+        function debugDataStatus() {
+            console.log("Running data diagnostics...");
+            
+            // Create a debugging panel
+            const debugPanel = document.createElement('div');
+            debugPanel.className = 'debug-panel';
+            
+            // Check for visualizationData
+            const visualizationData = localStorage.getItem('visualizationData');
+            
+            // Check for raw pushup and pullup logs
+            const pushupLogs = localStorage.getItem('pushupLogs');
+            const pullupLogs = localStorage.getItem('pullupLogs');
+            
+            // Build status report
+            let statusHtml = '<h3>Debug Status</h3>';
+            
+            if (visualizationData) {
+                try {
+                    const parsedData = JSON.parse(visualizationData);
+                    statusHtml += `<p>✅ VisualizationData found: ${parsedData.length} entries</p>`;
+                    
+                    // Add details about the data
+                    const pushupCount = parsedData.filter(item => item.exercise === 'pushup').length;
+                    const pullupCount = parsedData.filter(item => item.exercise === 'pullup').length;
+                    
+                    statusHtml += `<p>- Pushup entries: ${pushupCount}</p>`;
+                    statusHtml += `<p>- Pullup entries: ${pullupCount}</p>`;
+                    
+                    // Show a few sample entries
+                    if (parsedData.length > 0) {
+                        statusHtml += '<p>Sample entry: ' + JSON.stringify(parsedData[0]) + '</p>';
+                    }
+                } catch (e) {
+                    statusHtml += `<p>❌ Error parsing visualizationData: ${e.message}</p>`;
+                }
+            } else {
+                statusHtml += '<p>❌ No visualizationData found in localStorage</p>';
+            }
+            
+            // Check raw logs
+            if (pushupLogs) {
+                try {
+                    const parsedPushups = JSON.parse(pushupLogs);
+                    statusHtml += `<p>✅ Raw pushupLogs found: ${parsedPushups.length} entries</p>`;
+                    
+                    // Add sample entry
+                    if (parsedPushups.length > 0) {
+                        statusHtml += '<p>Sample pushup: ' + JSON.stringify(parsedPushups[0]) + '</p>';
+                    }
+                } catch (e) {
+                    statusHtml += `<p>❌ Error parsing pushupLogs: ${e.message}</p>`;
+                }
+            } else {
+                statusHtml += '<p>❌ No pushupLogs found in localStorage</p>';
+            }
+            
+            if (pullupLogs) {
+                try {
+                    const parsedPullups = JSON.parse(pullupLogs);
+                    statusHtml += `<p>✅ Raw pullupLogs found: ${parsedPullups.length} entries</p>`;
+                } catch (e) {
+                    statusHtml += `<p>❌ Error parsing pullupLogs: ${e.message}</p>`;
+                }
+            } else {
+                statusHtml += '<p>❌ No pullupLogs found in localStorage</p>';
+            }
+            
+            // Add button to fix data manually if needed
+            statusHtml += '<button id="fixDataBtn">Fix Data Format</button>';
+            
+            debugPanel.innerHTML = statusHtml;
+            
+            // Insert debug panel into the page
+            const container = document.querySelector('.container');
+            container.appendChild(debugPanel);
+            
+            // Add event listener to fix data button
+            document.getElementById('fixDataBtn').addEventListener('click', function() {
+                // Try to format data properly from raw logs
+                if (pushupLogs || pullupLogs) {
+                    try {
+                        const parsedPushups = pushupLogs ? JSON.parse(pushupLogs) : [];
+                        const parsedPullups = pullupLogs ? JSON.parse(pullupLogs) : [];
+                        
+                        const formattedPushups = parsedPushups.map(log => ({
+                            date: new Date(log.date).toISOString().split('T')[0],
+                            exercise: 'pushup',
+                            count: log.count
+                        }));
+                        
+                        const formattedPullups = parsedPullups.map(log => ({
+                            date: new Date(log.date).toISOString().split('T')[0],
+                            exercise: 'pullup',
+                            count: log.count
+                        }));
+                        
+                        const formattedData = [...formattedPushups, ...formattedPullups];
+                        
+                        // Store the formatted data
+                        localStorage.setItem('visualizationData', JSON.stringify(formattedData));
+                        
+                        // Update the display
+                        workoutData = formattedData;
+                        updateChart(getActivePeriod());
+                        
+                        alert('Data format fixed! Found and formatted ' + formattedData.length + ' workout entries.');
+                        
+                        // Refresh debug panel
+                        debugDataStatus();
+                    } catch (e) {
+                        alert('Error fixing data: ' + e.message);
+                    }
+                } else {
+                    alert('No raw logs found to fix the data format.');
+                }
+            });
         }
         
         // Update chart with new data based on time period
         function updateChart(period = 'week') {
-            if (!workoutData.length) return;
+            console.log("Updating chart with period:", period);
+            if (!workoutData.length) {
+                console.log("No workout data to display");
+                return;
+            }
             
             // Get pushup and pullup data
             const pushupData = workoutData.filter(item => item.exercise === 'pushup');
             const pullupData = workoutData.filter(item => item.exercise === 'pullup');
+            
+            console.log("Filtered data - pushups:", pushupData.length, "pullups:", pullupData.length);
             
             // Sort data by date
             const sortedPushupData = [...pushupData].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -467,7 +619,10 @@
             const allDates = [...new Set([...pushupData.map(item => item.date), ...pullupData.map(item => item.date)])];
             const sortedDates = allDates.sort((a, b) => new Date(a) - new Date(b));
             
-            if (sortedDates.length === 0) return;
+            if (sortedDates.length === 0) {
+                console.log("No dates found after filtering");
+                return;
+            }
             
             // Filter data based on selected time period
             let filteredDates = sortedDates;
@@ -487,12 +642,15 @@
                 filteredDates = sortedDates.filter(date => new Date(date) >= oneYearAgo);
             }
             
+            console.log("Filtered dates for period:", filteredDates.length);
+            
             if (filteredDates.length === 0) {
                 // If no dates in the filtered range, show empty chart
                 exerciseChart.data.labels = [];
                 exerciseChart.data.datasets[0].data = [];
                 exerciseChart.data.datasets[1].data = [];
                 exerciseChart.update();
+                console.log("No dates in filtered range, showing empty chart");
                 return;
             }
             
@@ -506,6 +664,8 @@
                 dateRange.push(currentDate.toISOString().split('T')[0]);
                 currentDate.setDate(currentDate.getDate() + 1);
             }
+            
+            console.log("Date range:", dateRange.length, "days");
             
             // Create maps for quick lookup
             const pushupMap = new Map();
@@ -538,6 +698,8 @@
             exerciseChart.data.datasets[0].data = pushupDataset;
             exerciseChart.data.datasets[1].data = pullupDataset;
             exerciseChart.update();
+            
+            console.log("Chart updated with", dateRange.length, "data points");
             
             // Update stats
             updatePushupStats(sortedPushupData);
@@ -641,6 +803,47 @@
             }
             
             return currentStreak;
+        }
+        
+        // Fixed toggle function for exercise visibility
+        function toggleExerciseVisibility(exercise) {
+            console.log('Toggle clicked for:', exercise);
+            
+            if (exercise === 'pushup') {
+                showPushups = !showPushups;
+                const btn = document.getElementById('pushupToggle');
+                if (showPushups) {
+                    btn.classList.remove('inactive');
+                    btn.style.backgroundColor = '#4a90e2';
+                    btn.style.color = 'white';
+                } else {
+                    btn.classList.add('inactive');
+                    btn.style.backgroundColor = '#f5f7fa';
+                    btn.style.color = '#666';
+                }
+            } else if (exercise === 'pullup') {
+                showPullups = !showPullups;
+                const btn = document.getElementById('pullupToggle');
+                if (showPullups) {
+                    btn.classList.remove('inactive');
+                    btn.style.backgroundColor = '#e24a4a';
+                    btn.style.color = 'white';
+                } else {
+                    btn.classList.add('inactive');
+                    btn.style.backgroundColor = '#f5f7fa';
+                    btn.style.color = '#666';
+                }
+            }
+            
+            // Force update the chart
+            if (exerciseChart) {
+                exerciseChart.data.datasets[0].hidden = !showPushups;
+                exerciseChart.data.datasets[1].hidden = !showPullups;
+                exerciseChart.update();
+                console.log('Chart updated: pushups=' + showPushups + ', pullups=' + showPullups);
+            } else {
+                console.log('Chart not initialized yet');
+            }
         }
         
         // Parse JSON data
@@ -786,31 +989,22 @@
             return activeBtn ? activeBtn.dataset.period : 'week';
         }
         
-        // Toggle exercise visibility
-        function toggleExerciseVisibility(exercise) {
-            if (exercise === 'pushup') {
-                showPushups = !showPushups;
-                const btn = document.getElementById('pushupToggle');
-                btn.classList.toggle('inactive', !showPushups);
-            } else if (exercise === 'pullup') {
-                showPullups = !showPullups;
-                const btn = document.getElementById('pullupToggle');
-                btn.classList.toggle('inactive', !showPullups);
-            }
-            
-            updateChart(getActivePeriod());
-        }
-        
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
+            console.log("Page loaded, initializing...");
+            
             // Initialize chart
             initChart();
             
             // First check for local data
             const foundLocalData = checkForLocalData();
             
+            // Add debug panel
+            debugDataStatus();
+            
             // If no local data was found, load sample data
             if (!foundLocalData) {
+                console.log("Loading sample data instead");
                 workoutData = sampleData;
                 updateChart('week');
             }
@@ -818,6 +1012,7 @@
             // Time period selection
             document.querySelectorAll('.period-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
+                    console.log('Period button clicked:', this.dataset.period);
                     document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     updateChart(this.dataset.period);
@@ -826,10 +1021,12 @@
             
             // Exercise toggle
             document.getElementById('pushupToggle').addEventListener('click', function() {
+                console.log('Pushup toggle clicked');
                 toggleExerciseVisibility('pushup');
             });
             
             document.getElementById('pullupToggle').addEventListener('click', function() {
+                console.log('Pullup toggle clicked');
                 toggleExerciseVisibility('pullup');
             });
             
@@ -867,4 +1064,9 @@
                     handleFileUpload(file);
                 }
             });
+            
+            console.log("Initialization complete");
         });
+    </script>
+</body>
+</html>
