@@ -5,56 +5,237 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <title>Workout History</title>
+    <title>Workout Tracker</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         /* Base Styles */
         body {
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             margin: 0;
-            padding: 0;
-            background-color: #f5f7fa;
-            color: #333;
+            padding: 16px;
+            background: #f0f2f5;
             line-height: 1.4;
             -webkit-text-size-adjust: 100%;
         }
         
         .container {
-            padding: 12px;
-            max-width: 100%;
-            box-sizing: border-box;
-        }
-        
-        h1, h2, h3 {
-            margin-top: 0;
-            font-weight: 600;
-        }
-        
-        h1 {
-            font-size: 1.4rem;
-            margin-bottom: 0.8rem;
-        }
-        
-        h2 {
-            font-size: 1.2rem;
-            margin-bottom: 0.6rem;
-        }
-        
-        h3 {
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
+            max-width: 600px;
+            margin: 0 auto;
         }
         
         /* Card Components */
         .card {
-            background-color: white;
+            background: white;
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Input Fields and Buttons */
+        .input-group {
+            display: flex;
+            gap: 8px;
             margin-bottom: 16px;
         }
         
-        /* Stats */
+        input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: default;
+        }
+        
+        /* Stats Display */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .goal-card {
+            background: #e8f5e9;
+            grid-column: span 2;
+        }
+        
+        .pullup-goal {
+            background: #e3f2fd;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007AFF;
+        }
+        
+        .goal-value {
+            color: #2e7d32;
+        }
+        
+        .pullup-value {
+            color: #1565c0;
+        }
+        
+        /* Logs */
+        .log {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .log-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        /* Progress Indicators */
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 4px;
+            height: 8px;
+            margin-top: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .pushup-progress {
+            background: #4caf50;
+        }
+        
+        .pullup-progress {
+            background: #2196f3;
+        }
+        
+        /* Tab System */
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 16px;
+            gap: 8px;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #f0f0f0;
+            color: #666;
+        }
+        
+        .tab-button.active {
+            background: #007AFF;
+            color: white;
+        }
+        
+        /* Exercise Type Labels */
+        .exercise-type {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+        
+        .pushup-type {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .pullup-type {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        /* Notification Settings */
+        .notification-settings {
+            margin-top: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .switch {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .time-select {
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            width: 100%;
+        }
+        
+        /* Visualization Styles */
+        .view-toggle {
+            display: flex;
+            margin-top: 20px;
+            margin-bottom: 16px;
+            gap: 8px;
+        }
+        
+        .view-tab {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #f0f0f0;
+            color: #666;
+            text-align: center;
+        }
+        
+        .view-tab.active {
+            background: #007AFF;
+            color: white;
+        }
+        
+        #tracker-view, #visualization-view {
+            display: none;
+        }
+        
+        #tracker-view.active, #visualization-view.active {
+            display: block;
+        }
+        
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -68,45 +249,19 @@
             gap: 8px;
         }
         
-        .stat-card {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-        }
-        
-        .stat-card h3 {
-            margin: 0;
-            font-size: 0.75rem;
-            color: #666;
-            font-weight: normal;
-        }
-        
-        .stat-card p {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin: 4px 0 0;
-        }
-        
-        .pushup-stats h2,
-        .pushup-stats p {
-            color: #4a90e2;
-        }
-        
-        .pullup-stats h2,
-        .pullup-stats p {
-            color: #e24a4a;
-        }
-        
-        /* Chart */
         .chart-container {
             position: relative;
-            height: 200px; /* Smaller height for mobile */
+            height: 250px;
             width: 100%;
             margin-top: 10px;
         }
         
-        /* Tabs for time periods */
+        .exercise-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
         .time-period {
             display: flex;
             gap: 4px;
@@ -116,42 +271,24 @@
         .time-period button {
             flex: 1;
             padding: 8px 4px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            background: #f5f7fa;
-            color: #666;
+            font-size: 14px;
         }
         
-        .time-period button.active {
-            background: #4a90e2;
-            color: white;
+        /* Color coding for the stats */
+        .pushup-stats h2 {
+            color: #4a90e2;
         }
         
-        /* Exercise toggle buttons */
-        .exercise-toggle {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        
-        .exercise-toggle button {
-            flex: 1;
-            padding: 8px;
-            border-radius: 8px;
-            border: none;
-            font-size: 0.9rem;
-            font-weight: 500;
+        .pullup-stats h2 {
+            color: #e24a4a;
         }
         
         #pushupToggle {
             background-color: #4a90e2;
-            color: white;
         }
         
         #pullupToggle {
             background-color: #e24a4a;
-            color: white;
         }
         
         #pushupToggle.inactive, 
@@ -160,209 +297,388 @@
             color: #666;
             border: 1px solid #ddd;
         }
-        
-        /* Data section (hidden by default on mobile) */
-        .data-input {
-            display: none; /* Hidden by default on mobile */
-        }
-        
-        .data-toggle {
-            display: block;
-            width: 100%;
-            padding: 8px;
-            margin-top: 10px;
-            background: #f5f7fa;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-            color: #666;
-        }
-        
-        /* Show data section when active */
-        .data-input.active {
-            display: block;
-            margin-top: 12px;
-        }
-        
-        textarea {
-            width: 100%;
-            height: 120px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 8px;
-            font-family: monospace;
-            font-size: 0.8rem;
-            box-sizing: border-box;
-        }
-        
-        .button-row {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-        
-        .button-row button {
-            flex: 1;
-            background: #4a90e2;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-        }
-        
-        /* Back button */
-        .back-button {
-            display: block;
-            width: 100%;
-            background: #f5f7fa;
-            color: #666;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 16px;
-            text-align: center;
-            font-size: 0.9rem;
-            text-decoration: none;
-        }
-        
-        /* Debug panel */
-        .debug-panel {
-            padding: 10px;
-            margin: 10px 0;
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 12px;
-        }
-        
-        .debug-panel h3 {
-            margin-top: 0;
-        }
-        
-        .debug-panel button {
-            margin-top: 10px;
-            padding: 5px 10px;
-            background: #4a90e2;
-            color: white;
-            border: none;
-            border-radius: 4px;
-        }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <div class="card">
-            <h1>Workout History</h1>
-            
-            <div class="stats-grid">
-                <div class="card pushup-stats">
-                    <h2>Pushups</h2>
-                    <div class="stats-container">
-                        <div class="stat-card">
-                            <h3>Total</h3>
-                            <p id="totalPushups">0</p>
+        <!-- View Toggle Tabs -->
+        <div class="view-toggle">
+            <button id="trackerTab" class="view-tab active" onclick="switchView('tracker')">Tracker</button>
+            <button id="visualizationTab" class="view-tab" onclick="switchView('visualization')">Visualization</button>
+        </div>
+        
+        <!-- Tracker View -->
+        <div id="tracker-view" class="active">
+            <div class="card">
+                <h2>Workout Tracker</h2>
+                <div class="tab-buttons">
+                    <button id="pushupTab" class="tab-button active" onclick="switchTab('pushup')">Pushups</button>
+                    <button id="pullupTab" class="tab-button" onclick="switchTab('pullup')">Pullups</button>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="exerciseCount" placeholder="Number of pushups">
+                    <button onclick="logExercise()" id="logButton">Log</button>
+                </div>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-label">Today</div>
+                        <div class="stat-value" id="todayCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total</div>
+                        <div class="stat-value" id="totalCount">0</div>
+                    </div>
+                    <div class="stat-card goal-card" id="pushupGoalCard">
+                        <div class="stat-label">2025 Pushup Goal Progress</div>
+                        <div class="stat-value goal-value" id="pushupGoalProgress">0/10000</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill pushup-progress" id="pushupProgressBar" style="width: 0%"></div>
                         </div>
-                        <div class="stat-card">
-                            <h3>Average</h3>
-                            <p id="averagePushups">0</p>
+                        <div class="stat-label" style="margin-top: 8px;">
+                            Daily target: <span id="pushupDailyTarget">0</span> pushups
                         </div>
-                        <div class="stat-card">
-                            <h3>Max</h3>
-                            <p id="maxPushups">0</p>
+                    </div>
+                    <div class="stat-card goal-card pullup-goal" id="pullupGoalCard">
+                        <div class="stat-label">2025 Pullup Goal Progress</div>
+                        <div class="stat-value pullup-value" id="pullupGoalProgress">0/1000</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill pullup-progress" id="pullupProgressBar" style="width: 0%"></div>
                         </div>
-                        <div class="stat-card">
-                            <h3>Streak</h3>
-                            <p id="currentPushupStreak">0</p>
+                        <div class="stat-label" style="margin-top: 8px;">
+                            Daily target: <span id="pullupDailyTarget">0</span> pullups
                         </div>
                     </div>
                 </div>
-                
-                <div class="card pullup-stats">
-                    <h2>Pullups</h2>
-                    <div class="stats-container">
-                        <div class="stat-card">
-                            <h3>Total</h3>
-                            <p id="totalPullups">0</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Average</h3>
-                            <p id="averagePullups">0</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Max</h3>
-                            <p id="maxPullups">0</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Streak</h3>
-                            <p id="currentPullupStreak">0</p>
-                        </div>
-                    </div>
-                </div>
             </div>
-        </div>
-        
-        <div class="card">
-            <div class="exercise-toggle">
-                <button id="pushupToggle">Show Pushups</button>
-                <button id="pullupToggle">Show Pullups</button>
-            </div>
-            
-            <div class="time-period">
-                <button class="period-btn active" data-period="week">Week</button>
-                <button class="period-btn" data-period="month">Month</button>
-                <button class="period-btn" data-period="year">Year</button>
-                <button class="period-btn" data-period="all">All</button>
-            </div>
-            
-            <div class="chart-container">
-                <canvas id="exerciseChart"></canvas>
-            </div>
-            
-            <button class="data-toggle" id="dataToggle">Advanced Options</button>
-            
-            <div class="data-input" id="dataInputSection">
-                <textarea id="dataInput" placeholder='[
-  {"date": "2023-01-01", "exercise": "pushup", "count": 30},
-  {"date": "2023-01-01", "exercise": "pullup", "count": 10}
-]'></textarea>
-                
-                <div class="button-row">
-                    <button id="importBtn">Import Data</button>
-                    <button id="fileInputBtn">Upload File</button>
-                </div>
-                
-                <input type="file" id="fileInput" accept=".json,.csv" style="display:none;">
-            </div>
-        </div>
-        
-        <a href="javascript:history.back()" class="back-button">Back to Tracker</a>
-    </div>
     
+            <div class="card">
+                <h3>Notification Settings</h3>
+                <div class="notification-settings">
+                    <div class="switch">
+                        <input type="checkbox" id="notificationToggle" onclick="toggleNotifications()">
+                        <label for="notificationToggle">Enable daily reminder</label>
+                    </div>
+                    <select id="reminderTime" class="time-select" onchange="updateReminderTime()">
+                        <option value="20:00">8:00 PM</option>
+                        <option value="19:00">7:00 PM</option>
+                        <option value="21:00">9:00 PM</option>
+                    </select>
+                </div>
+            </div>
+    
+            <div class="card">
+                <h3>Recent Logs</h3>
+                <div class="log" id="logList"></div>
+            </div>
+        </div>
+        
+        <!-- Visualization View -->
+        <div id="visualization-view">
+            <div class="card">
+                <h2>Workout History</h2>
+                
+                <div class="stats-grid">
+                    <div class="card pushup-stats">
+                        <h2>Pushups</h2>
+                        <div class="stats-container">
+                            <div class="stat-card">
+                                <h3>Total</h3>
+                                <p id="totalPushups">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Average</h3>
+                                <p id="averagePushups">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Max</h3>
+                                <p id="maxPushups">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Streak</h3>
+                                <p id="currentPushupStreak">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card pullup-stats">
+                        <h2>Pullups</h2>
+                        <div class="stats-container">
+                            <div class="stat-card">
+                                <h3>Total</h3>
+                                <p id="totalPullups">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Average</h3>
+                                <p id="averagePullups">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Max</h3>
+                                <p id="maxPullups">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Streak</h3>
+                                <p id="currentPullupStreak">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="exercise-toggle">
+                    <button id="pushupToggle">Show Pushups</button>
+                    <button id="pullupToggle">Show Pullups</button>
+                </div>
+                
+                <div class="time-period">
+                    <button class="period-btn active" data-period="week">Week</button>
+                    <button class="period-btn" data-period="month">Month</button>
+                    <button class="period-btn" data-period="year">Year</button>
+                    <button class="period-btn" data-period="all">All</button>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="exerciseChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Chart initialization
+        // ======================
+        // SHARED VARIABLES
+        // ======================
+        const PUSHUP_GOAL = 10000;
+        const PULLUP_GOAL = 1000;
+        let currentExercise = 'pushup';
+        let notificationTimer;
+        
+        // Load data from localStorage - maintain backward compatibility
+        let pushupLogs = JSON.parse(localStorage.getItem('pushupLogs')) || [];
+        let pullupLogs = JSON.parse(localStorage.getItem('pullupLogs')) || [];
+        
+        // For visualization
         let exerciseChart;
-        let workoutData = [];
         let showPushups = true;
         let showPullups = true;
         
-        // Sample data for initial display
-        const sampleData = [
-            { date: '2023-02-01', exercise: 'pushup', count: 30 },
-            { date: '2023-02-01', exercise: 'pullup', count: 12 },
-            { date: '2023-02-02', exercise: 'pushup', count: 35 },
-            { date: '2023-02-02', exercise: 'pullup', count: 14 },
-            { date: '2023-02-03', exercise: 'pushup', count: 40 },
-            { date: '2023-02-03', exercise: 'pullup', count: 15 },
-            { date: '2023-02-04', exercise: 'pushup', count: 45 },
-            { date: '2023-02-04', exercise: 'pullup', count: 16 },
-            { date: '2023-02-05', exercise: 'pushup', count: 50 },
-            { date: '2023-02-05', exercise: 'pullup', count: 18 },
-            { date: '2023-02-06', exercise: 'pushup', count: 55 },
-            { date: '2023-02-06', exercise: 'pullup', count: 20 },
-            { date: '2023-02-07', exercise: 'pushup', count: 60 },
-            { date: '2023-02-07', exercise: 'pullup', count: 22 }
-        ];
+        // ======================
+        // VIEW SWITCHING
+        // ======================
+        function switchView(view) {
+            document.getElementById('tracker-view').classList.toggle('active', view === 'tracker');
+            document.getElementById('visualization-view').classList.toggle('active', view === 'visualization');
+            
+            document.getElementById('trackerTab').classList.toggle('active', view === 'tracker');
+            document.getElementById('visualizationTab').classList.toggle('active', view === 'visualization');
+            
+            if (view === 'visualization') {
+                initializeVisualization();
+            }
+        }
+        
+        // ======================
+        // TRACKER FUNCTIONS
+        // ======================
+        function getDaysLeftInYear() {
+            const today = new Date();
+            const endOfYear = new Date(2025, 11, 31);
+            const diffTime = Math.abs(endOfYear - today);
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        function calculateDailyTarget(logs, goal) {
+            const totalDone = logs.reduce((sum, log) => sum + log.count, 0);
+            const remaining = goal - totalDone;
+            const daysLeft = getDaysLeftInYear();
+            return Math.ceil(Math.max(0, remaining / daysLeft));
+        }
+
+        function switchTab(exercise) {
+            currentExercise = exercise;
+            document.getElementById('pushupTab').classList.toggle('active', exercise === 'pushup');
+            document.getElementById('pullupTab').classList.toggle('active', exercise === 'pullup');
+            document.getElementById('exerciseCount').placeholder = `Number of ${exercise}s`;
+            updateDisplay();
+        }
+
+        function logExercise() {
+            const input = document.getElementById('exerciseCount');
+            const count = parseInt(input.value);
+            if (isNaN(count) || count <= 0) return;
+
+            const log = {
+                date: new Date().toISOString(),
+                count: count
+            };
+
+            if (currentExercise === 'pushup') {
+                pushupLogs.unshift(log);
+                localStorage.setItem('pushupLogs', JSON.stringify(pushupLogs));
+            } else {
+                pullupLogs.unshift(log);
+                localStorage.setItem('pullupLogs', JSON.stringify(pullupLogs));
+            }
+
+            input.value = '';
+            updateDisplay();
+            
+            // If visualization has been initialized already, update it too
+            if (exerciseChart) {
+                updateVisualizationData();
+            }
+            
+            // Reschedule notification if needed
+            if (document.getElementById('notificationToggle').checked) {
+                scheduleNotification();
+            }
+        }
+
+        function updateDisplay() {
+            const today = new Date().toDateString();
+            const logs = currentExercise === 'pushup' ? pushupLogs : pullupLogs;
+            
+            const todayTotal = logs
+                .filter(log => new Date(log.date).toDateString() === today)
+                .reduce((sum, log) => sum + log.count, 0);
+
+            const allTimeTotal = logs.reduce((sum, log) => sum + log.count, 0);
+            
+            // Update basic stats
+            document.getElementById('todayCount').textContent = todayTotal;
+            document.getElementById('totalCount').textContent = allTimeTotal;
+            
+            // Update both goal progresses
+            const pushupTotal = pushupLogs.reduce((sum, log) => sum + log.count, 0);
+            const pullupTotal = pullupLogs.reduce((sum, log) => sum + log.count, 0);
+            
+            const pushupPercent = (pushupTotal / PUSHUP_GOAL) * 100;
+            const pullupPercent = (pullupTotal / PULLUP_GOAL) * 100;
+            
+            document.getElementById('pushupGoalProgress').textContent = `${pushupTotal}/${PUSHUP_GOAL}`;
+            document.getElementById('pullupGoalProgress').textContent = `${pullupTotal}/${PULLUP_GOAL}`;
+            document.getElementById('pushupProgressBar').style.width = `${Math.min(100, pushupPercent)}%`;
+            document.getElementById('pullupProgressBar').style.width = `${Math.min(100, pullupPercent)}%`;
+            
+            // Update daily targets
+            document.getElementById('pushupDailyTarget').textContent = calculateDailyTarget(pushupLogs, PUSHUP_GOAL);
+            document.getElementById('pullupDailyTarget').textContent = calculateDailyTarget(pullupLogs, PULLUP_GOAL);
+
+            // Update log list with combined logs
+            const combinedLogs = [...pushupLogs, ...pullupLogs]
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 10);
+
+            const logList = document.getElementById('logList');
+            logList.innerHTML = combinedLogs
+                .map(log => {
+                    const isFromPushupLog = pushupLogs.some(p => p.date === log.date && p.count === log.count);
+                    const type = isFromPushupLog ? 'pushup' : 'pullup';
+                    return `
+                        <div class="log-item">
+                            <span>
+                                <span class="exercise-type ${type}-type">${type}s</span>
+                                ${new Date(log.date).toLocaleDateString()}
+                            </span>
+                            <span>${log.count} reps</span>
+                        </div>
+                    `;
+                })
+                .join('');
+        }
+
+        async function setupNotifications() {
+            if (!('Notification' in window)) {
+                alert('This browser does not support notifications');
+                return;
+            }
+
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                const notificationEnabled = localStorage.getItem('notificationEnabled') === 'true';
+                document.getElementById('notificationToggle').checked = notificationEnabled;
+                if (notificationEnabled) {
+                    scheduleNotification();
+                }
+            }
+        }
+
+        function toggleNotifications() {
+            const enabled = document.getElementById('notificationToggle').checked;
+            localStorage.setItem('notificationEnabled', enabled);
+            if (enabled) {
+                scheduleNotification();
+            } else {
+                if (notificationTimer) clearTimeout(notificationTimer);
+            }
+        }
+
+        function updateReminderTime() {
+            if (document.getElementById('notificationToggle').checked) {
+                scheduleNotification();
+            }
+        }
+
+        function scheduleNotification() {
+            if (notificationTimer) clearTimeout(notificationTimer);
+            
+            const reminderTime = document.getElementById('reminderTime').value;
+            const [hours, minutes] = reminderTime.split(':').map(Number);
+            
+            const now = new Date();
+            const scheduledTime = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                hours,
+                minutes
+            );
+            
+            if (scheduledTime <= now) {
+                scheduledTime.setDate(scheduledTime.getDate() + 1);
+            }
+            
+            const timeUntilNotification = scheduledTime - now;
+            
+            notificationTimer = setTimeout(() => {
+                checkAndNotify();
+                scheduleNotification(); // Schedule next day's notification
+            }, timeUntilNotification);
+        }
+
+        function checkAndNotify() {
+            const today = new Date().toDateString();
+            const pushupToday = pushupLogs.some(log => 
+                new Date(log.date).toDateString() === today
+            );
+            const pullupToday = pullupLogs.some(log => 
+                new Date(log.date).toDateString() === today
+            );
+
+            if (!pushupToday || !pullupToday) {
+                const missingExercises = [];
+                if (!pushupToday) missingExercises.push('pushups');
+                if (!pullupToday) missingExercises.push('pullups');
+                
+                new Notification('Workout Reminder', {
+                    body: `Don't forget to log your ${missingExercises.join(' and ')} for today!`,
+                    icon: '/favicon.ico'
+                });
+            }
+        }
+        
+        // ======================
+        // VISUALIZATION FUNCTIONS
+        // ======================
+        
+        function initializeVisualization() {
+            // Only initialize once
+            if (!exerciseChart) {
+                initChart();
+                updateVisualizationData();
+            }
+        }
         
         // Initialize the chart
         function initChart() {
@@ -370,7 +686,7 @@
             
             // Set Chart.js default font
             Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, sans-serif';
-            Chart.defaults.font.size = 10;
+            Chart.defaults.font.size = 12;
             
             exerciseChart = new Chart(ctx, {
                 type: 'line',
@@ -436,12 +752,7 @@
                     },
                     plugins: {
                         legend: {
-                            display: false,
-                            position: 'top',
-                            labels: {
-                                boxWidth: 10,
-                                padding: 10
-                            }
+                            display: false
                         },
                         tooltip: {
                             callbacks: {
@@ -455,161 +766,40 @@
             });
         }
         
-        // Check for data in localStorage
-        function checkForLocalData() {
-            console.log("Checking for local data...");
-            const localData = localStorage.getItem('visualizationData');
-            if (localData) {
-                try {
-                    const parsedData = JSON.parse(localData);
-                    if (Array.isArray(parsedData) && parsedData.length > 0) {
-                        // We found valid data, use it
-                        console.log("Found valid data:", parsedData.length, "entries");
-                        workoutData = parsedData;
-                        updateChart(getActivePeriod());
-                        return true;
-                    }
-                } catch (e) {
-                    console.error('Error parsing local data:', e);
-                }
-            }
-            console.log("No valid visualization data found");
-            return false;
+        // Format and update visualization data directly from pushupLogs and pullupLogs
+        function updateVisualizationData() {
+            // Format data from logs
+            const formattedPushups = pushupLogs.map(log => ({
+                date: new Date(log.date).toISOString().split('T')[0],
+                exercise: 'pushup',
+                count: log.count
+            }));
+            
+            const formattedPullups = pullupLogs.map(log => ({
+                date: new Date(log.date).toISOString().split('T')[0],
+                exercise: 'pullup',
+                count: log.count
+            }));
+            
+            const workoutData = [...formattedPushups, ...formattedPullups];
+            
+            // Update chart with this data
+            updateChart(workoutData, getActivePeriod());
         }
         
-        // Debug Data Status - shows a debug panel with information about localStorage data
-        function debugDataStatus() {
-            console.log("Running data diagnostics...");
-            
-            // Create a debugging panel
-            const debugPanel = document.createElement('div');
-            debugPanel.className = 'debug-panel';
-            
-            // Check for visualizationData
-            const visualizationData = localStorage.getItem('visualizationData');
-            
-            // Check for raw pushup and pullup logs
-            const pushupLogs = localStorage.getItem('pushupLogs');
-            const pullupLogs = localStorage.getItem('pullupLogs');
-            
-            // Build status report
-            let statusHtml = '<h3>Debug Status</h3>';
-            
-            if (visualizationData) {
-                try {
-                    const parsedData = JSON.parse(visualizationData);
-                    statusHtml += `<p>✅ VisualizationData found: ${parsedData.length} entries</p>`;
-                    
-                    // Add details about the data
-                    const pushupCount = parsedData.filter(item => item.exercise === 'pushup').length;
-                    const pullupCount = parsedData.filter(item => item.exercise === 'pullup').length;
-                    
-                    statusHtml += `<p>- Pushup entries: ${pushupCount}</p>`;
-                    statusHtml += `<p>- Pullup entries: ${pullupCount}</p>`;
-                    
-                    // Show a few sample entries
-                    if (parsedData.length > 0) {
-                        statusHtml += '<p>Sample entry: ' + JSON.stringify(parsedData[0]) + '</p>';
-                    }
-                } catch (e) {
-                    statusHtml += `<p>❌ Error parsing visualizationData: ${e.message}</p>`;
-                }
-            } else {
-                statusHtml += '<p>❌ No visualizationData found in localStorage</p>';
-            }
-            
-            // Check raw logs
-            if (pushupLogs) {
-                try {
-                    const parsedPushups = JSON.parse(pushupLogs);
-                    statusHtml += `<p>✅ Raw pushupLogs found: ${parsedPushups.length} entries</p>`;
-                    
-                    // Add sample entry
-                    if (parsedPushups.length > 0) {
-                        statusHtml += '<p>Sample pushup: ' + JSON.stringify(parsedPushups[0]) + '</p>';
-                    }
-                } catch (e) {
-                    statusHtml += `<p>❌ Error parsing pushupLogs: ${e.message}</p>`;
-                }
-            } else {
-                statusHtml += '<p>❌ No pushupLogs found in localStorage</p>';
-            }
-            
-            if (pullupLogs) {
-                try {
-                    const parsedPullups = JSON.parse(pullupLogs);
-                    statusHtml += `<p>✅ Raw pullupLogs found: ${parsedPullups.length} entries</p>`;
-                } catch (e) {
-                    statusHtml += `<p>❌ Error parsing pullupLogs: ${e.message}</p>`;
-                }
-            } else {
-                statusHtml += '<p>❌ No pullupLogs found in localStorage</p>';
-            }
-            
-            // Add button to fix data manually if needed
-            statusHtml += '<button id="fixDataBtn">Fix Data Format</button>';
-            
-            debugPanel.innerHTML = statusHtml;
-            
-            // Insert debug panel into the page
-            const container = document.querySelector('.container');
-            container.appendChild(debugPanel);
-            
-            // Add event listener to fix data button
-            document.getElementById('fixDataBtn').addEventListener('click', function() {
-                // Try to format data properly from raw logs
-                if (pushupLogs || pullupLogs) {
-                    try {
-                        const parsedPushups = pushupLogs ? JSON.parse(pushupLogs) : [];
-                        const parsedPullups = pullupLogs ? JSON.parse(pullupLogs) : [];
-                        
-                        const formattedPushups = parsedPushups.map(log => ({
-                            date: new Date(log.date).toISOString().split('T')[0],
-                            exercise: 'pushup',
-                            count: log.count
-                        }));
-                        
-                        const formattedPullups = parsedPullups.map(log => ({
-                            date: new Date(log.date).toISOString().split('T')[0],
-                            exercise: 'pullup',
-                            count: log.count
-                        }));
-                        
-                        const formattedData = [...formattedPushups, ...formattedPullups];
-                        
-                        // Store the formatted data
-                        localStorage.setItem('visualizationData', JSON.stringify(formattedData));
-                        
-                        // Update the display
-                        workoutData = formattedData;
-                        updateChart(getActivePeriod());
-                        
-                        alert('Data format fixed! Found and formatted ' + formattedData.length + ' workout entries.');
-                        
-                        // Refresh debug panel
-                        debugDataStatus();
-                    } catch (e) {
-                        alert('Error fixing data: ' + e.message);
-                    }
-                } else {
-                    alert('No raw logs found to fix the data format.');
-                }
-            });
+        // Get active time period for visualization
+        function getActivePeriod() {
+            const activeBtn = document.querySelector('.period-btn.active');
+            return activeBtn ? activeBtn.dataset.period : 'week';
         }
         
-        // Update chart with new data based on time period
-        function updateChart(period = 'week') {
-            console.log("Updating chart with period:", period);
-            if (!workoutData.length) {
-                console.log("No workout data to display");
-                return;
-            }
+        // Update chart with workout data and time period
+        function updateChart(workoutData, period = 'week') {
+            if (!workoutData.length || !exerciseChart) return;
             
             // Get pushup and pullup data
             const pushupData = workoutData.filter(item => item.exercise === 'pushup');
             const pullupData = workoutData.filter(item => item.exercise === 'pullup');
-            
-            console.log("Filtered data - pushups:", pushupData.length, "pullups:", pullupData.length);
             
             // Sort data by date
             const sortedPushupData = [...pushupData].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -619,10 +809,7 @@
             const allDates = [...new Set([...pushupData.map(item => item.date), ...pullupData.map(item => item.date)])];
             const sortedDates = allDates.sort((a, b) => new Date(a) - new Date(b));
             
-            if (sortedDates.length === 0) {
-                console.log("No dates found after filtering");
-                return;
-            }
+            if (sortedDates.length === 0) return;
             
             // Filter data based on selected time period
             let filteredDates = sortedDates;
@@ -642,15 +829,12 @@
                 filteredDates = sortedDates.filter(date => new Date(date) >= oneYearAgo);
             }
             
-            console.log("Filtered dates for period:", filteredDates.length);
-            
             if (filteredDates.length === 0) {
                 // If no dates in the filtered range, show empty chart
                 exerciseChart.data.labels = [];
                 exerciseChart.data.datasets[0].data = [];
                 exerciseChart.data.datasets[1].data = [];
                 exerciseChart.update();
-                console.log("No dates in filtered range, showing empty chart");
                 return;
             }
             
@@ -664,8 +848,6 @@
                 dateRange.push(currentDate.toISOString().split('T')[0]);
                 currentDate.setDate(currentDate.getDate() + 1);
             }
-            
-            console.log("Date range:", dateRange.length, "days");
             
             // Create maps for quick lookup
             const pushupMap = new Map();
@@ -699,14 +881,48 @@
             exerciseChart.data.datasets[1].data = pullupDataset;
             exerciseChart.update();
             
-            console.log("Chart updated with", dateRange.length, "data points");
-            
             // Update stats
             updatePushupStats(sortedPushupData);
             updatePullupStats(sortedPullupData);
         }
         
-        // Update pushup stats
+        // Toggle exercise visibility in chart
+        function toggleExerciseVisibility(exercise) {
+            if (exercise === 'pushup') {
+                showPushups = !showPushups;
+                const btn = document.getElementById('pushupToggle');
+                if (showPushups) {
+                    btn.classList.remove('inactive');
+                    btn.style.backgroundColor = '#4a90e2';
+                    btn.style.color = 'white';
+                } else {
+                    btn.classList.add('inactive');
+                    btn.style.backgroundColor = '#f5f7fa';
+                    btn.style.color = '#666';
+                }
+            } else if (exercise === 'pullup') {
+                showPullups = !showPullups;
+                const btn = document.getElementById('pullupToggle');
+                if (showPullups) {
+                    btn.classList.remove('inactive');
+                    btn.style.backgroundColor = '#e24a4a';
+                    btn.style.color = 'white';
+                } else {
+                    btn.classList.add('inactive');
+                    btn.style.backgroundColor = '#f5f7fa';
+                    btn.style.color = '#666';
+                }
+            }
+            
+            // Force update the chart
+            if (exerciseChart) {
+                exerciseChart.data.datasets[0].hidden = !showPushups;
+                exerciseChart.data.datasets[1].hidden = !showPullups;
+                exerciseChart.update();
+            }
+        }
+        
+        // Update pushup stats for visualization
         function updatePushupStats(data) {
             // Calculate total pushups
             const totalPushups = data.reduce((sum, item) => sum + item.count, 0);
@@ -726,7 +942,7 @@
             document.getElementById('currentPushupStreak').textContent = streak;
         }
         
-        // Update pullup stats
+        // Update pullup stats for visualization
         function updatePullupStats(data) {
             // Calculate total pullups
             const totalPullups = data.reduce((sum, item) => sum + item.count, 0);
@@ -746,7 +962,7 @@
             document.getElementById('currentPullupStreak').textContent = streak;
         }
         
-        // Calculate streak for a given exercise
+        // Calculate streak for visualization
         function calculateStreak(data) {
             if (!data.length) return 0;
             
@@ -805,267 +1021,40 @@
             return currentStreak;
         }
         
-        // Fixed toggle function for exercise visibility
-        function toggleExerciseVisibility(exercise) {
-            console.log('Toggle clicked for:', exercise);
-            
-            if (exercise === 'pushup') {
-                showPushups = !showPushups;
-                const btn = document.getElementById('pushupToggle');
-                if (showPushups) {
-                    btn.classList.remove('inactive');
-                    btn.style.backgroundColor = '#4a90e2';
-                    btn.style.color = 'white';
-                } else {
-                    btn.classList.add('inactive');
-                    btn.style.backgroundColor = '#f5f7fa';
-                    btn.style.color = '#666';
-                }
-            } else if (exercise === 'pullup') {
-                showPullups = !showPullups;
-                const btn = document.getElementById('pullupToggle');
-                if (showPullups) {
-                    btn.classList.remove('inactive');
-                    btn.style.backgroundColor = '#e24a4a';
-                    btn.style.color = 'white';
-                } else {
-                    btn.classList.add('inactive');
-                    btn.style.backgroundColor = '#f5f7fa';
-                    btn.style.color = '#666';
-                }
-            }
-            
-            // Force update the chart
-            if (exerciseChart) {
-                exerciseChart.data.datasets[0].hidden = !showPushups;
-                exerciseChart.data.datasets[1].hidden = !showPullups;
-                exerciseChart.update();
-                console.log('Chart updated: pushups=' + showPushups + ', pullups=' + showPullups);
-            } else {
-                console.log('Chart not initialized yet');
-            }
-        }
+        // ======================
+        // INITIALIZATION
+        // ======================
         
-        // Parse JSON data
-        function parseJsonData(jsonString) {
-            try {
-                const data = JSON.parse(jsonString);
-                
-                if (!Array.isArray(data)) {
-                    throw new Error('Data must be an array');
-                }
-                
-                // Validate each entry
-                const validData = data.filter(item => {
-                    return item && typeof item === 'object' && 
-                           item.date && typeof item.date === 'string' &&
-                           !isNaN(new Date(item.date).getTime()) &&
-                           'count' in item && !isNaN(parseInt(item.count)) &&
-                           item.exercise && typeof item.exercise === 'string' &&
-                           (item.exercise.toLowerCase() === 'pushup' || 
-                            item.exercise.toLowerCase() === 'pullup');
-                }).map(item => ({
-                    date: new Date(item.date).toISOString().split('T')[0],
-                    exercise: item.exercise.toLowerCase(),
-                    count: parseInt(item.count)
-                }));
-                
-                if (validData.length === 0) {
-                    throw new Error('No valid data entries found');
-                }
-                
-                return validData;
-            } catch (error) {
-                alert('Error parsing data: ' + error.message);
-                return null;
-            }
-        }
-        
-        // Parse CSV data
-        function parseCsvData(csvString) {
-            try {
-                const lines = csvString.split(/\r?\n/);
-                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-                
-                const dateIndex = headers.findIndex(h => h.includes('date'));
-                const exerciseIndex = headers.findIndex(h => 
-                    h.includes('exercise') || 
-                    h.includes('type') || 
-                    h.includes('workout')
-                );
-                const countIndex = headers.findIndex(h => 
-                    h.includes('count') || 
-                    h.includes('reps') || 
-                    h.includes('number')
-                );
-                
-                if (dateIndex === -1 || countIndex === -1) {
-                    throw new Error('CSV must contain date and count columns');
-                }
-                
-                const data = [];
-                for (let i = 1; i < lines.length; i++) {
-                    if (!lines[i].trim()) continue;
-                    
-                    const values = lines[i].split(',');
-                    const dateStr = values[dateIndex].trim();
-                    const countStr = values[countIndex].trim();
-                    
-                    // If no exercise column, try to detect from other columns or default to pushup
-                    let exercise = 'pushup';
-                    if (exerciseIndex !== -1) {
-                        const exerciseValue = values[exerciseIndex].trim().toLowerCase();
-                        if (exerciseValue.includes('pull')) {
-                            exercise = 'pullup';
-                        } else if (exerciseValue.includes('push')) {
-                            exercise = 'pushup';
-                        }
-                    }
-                    
-                    const date = new Date(dateStr);
-                    if (isNaN(date.getTime())) continue;
-                    
-                    const count = parseInt(countStr);
-                    if (isNaN(count)) continue;
-                    
-                    data.push({
-                        date: date.toISOString().split('T')[0],
-                        exercise: exercise,
-                        count: count
-                    });
-                }
-                
-                if (data.length === 0) {
-                    throw new Error('No valid data entries found in CSV');
-                }
-                
-                return data;
-            } catch (error) {
-                alert('Error parsing CSV: ' + error.message);
-                return null;
-            }
-        }
-        
-        // Handle file upload
-        function handleFileUpload(file) {
-            const reader = new FileReader();
-            
-            reader.onload = function(event) {
-                const content = event.target.result;
-                
-                if (file.name.endsWith('.json')) {
-                    const data = parseJsonData(content);
-                    if (data) {
-                        workoutData = data;
-                        updateChart(getActivePeriod());
-                        localStorage.setItem('visualizationData', JSON.stringify(data));
-                    }
-                } else if (file.name.endsWith('.csv')) {
-                    const data = parseCsvData(content);
-                    if (data) {
-                        workoutData = data;
-                        updateChart(getActivePeriod());
-                        localStorage.setItem('visualizationData', JSON.stringify(data));
-                    }
-                } else {
-                    alert('Unsupported file type. Please upload a JSON or CSV file.');
-                }
-            };
-            
-            reader.onerror = function() {
-                alert('Error reading file');
-            };
-            
-            if (file.name.endsWith('.json') || file.name.endsWith('.csv')) {
-                reader.readAsText(file);
-            } else {
-                alert('Unsupported file type. Please upload a JSON or CSV file.');
-            }
-        }
-        
-        // Get active time period
-        function getActivePeriod() {
-            const activeBtn = document.querySelector('.period-btn.active');
-            return activeBtn ? activeBtn.dataset.period : 'week';
-        }
-        
-        // Event listeners
+        // Initialize tracker on page load
         document.addEventListener('DOMContentLoaded', function() {
-            console.log("Page loaded, initializing...");
+            // Initialize tracker view
+            updateDisplay();
             
-            // Initialize chart
-            initChart();
-            
-            // First check for local data
-            const foundLocalData = checkForLocalData();
-            
-            // Add debug panel
-            debugDataStatus();
-            
-            // If no local data was found, load sample data
-            if (!foundLocalData) {
-                console.log("Loading sample data instead");
-                workoutData = sampleData;
-                updateChart('week');
-            }
-            
-            // Time period selection
-            document.querySelectorAll('.period-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    console.log('Period button clicked:', this.dataset.period);
-                    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    updateChart(this.dataset.period);
-                });
+            // Setup event listeners for tracker
+            document.getElementById('exerciseCount').addEventListener('input', function() {
+                const value = this.value;
+                document.getElementById('logButton').disabled = !value || parseInt(value) <= 0;
             });
             
-            // Exercise toggle
+            // Setup event listeners for visualization
             document.getElementById('pushupToggle').addEventListener('click', function() {
-                console.log('Pushup toggle clicked');
                 toggleExerciseVisibility('pushup');
             });
             
             document.getElementById('pullupToggle').addEventListener('click', function() {
-                console.log('Pullup toggle clicked');
                 toggleExerciseVisibility('pullup');
             });
             
-            // Toggle data input section
-            document.getElementById('dataToggle').addEventListener('click', function() {
-                const dataSection = document.getElementById('dataInputSection');
-                dataSection.classList.toggle('active');
-                this.textContent = dataSection.classList.contains('active') ? 'Hide Advanced Options' : 'Advanced Options';
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    updateVisualizationData();
+                });
             });
             
-            // Import button
-            document.getElementById('importBtn').addEventListener('click', function() {
-                const inputData = document.getElementById('dataInput').value.trim();
-                if (inputData) {
-                    const data = parseJsonData(inputData);
-                    if (data) {
-                        workoutData = data;
-                        updateChart(getActivePeriod());
-                        localStorage.setItem('visualizationData', JSON.stringify(data));
-                    }
-                } else {
-                    alert('Please enter some data to import');
-                }
-            });
-            
-            // File input button
-            document.getElementById('fileInputBtn').addEventListener('click', function() {
-                document.getElementById('fileInput').click();
-            });
-            
-            // File input change
-            document.getElementById('fileInput').addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    handleFileUpload(file);
-                }
-            });
-            
-            console.log("Initialization complete");
+            // Setup notifications
+            setupNotifications();
         });
     </script>
 </body>
